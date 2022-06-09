@@ -14,7 +14,13 @@ const expandTo18Decimals =
     args: [name, symbol, CAP, deployer],
     log: true,
   });
-  await execute('BXHWorldToken', { from: deployer }, 'mint', deployer, INIT_CAP)
+  await execute(
+    "BXHWorldToken",
+    { from: deployer },
+    "mint",
+    deployer,
+    INIT_CAP
+  );
 };
 
 module.exports.tags = ["BXHWorldToken"];
