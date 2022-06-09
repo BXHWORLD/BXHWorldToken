@@ -12,28 +12,15 @@ import './ERC20PresetMinterPauser.sol';
  */
 contract BXHWorldToken is ERC20Permit, ERC20PresetMinterPauser, ERC20Capped{
 
-    uint256 private _holdersReflectionFees;
-    uint256 private _bXHPaybackLiquidityFees;
-    bool private _burnActivated;
-    address private _holdersReflectionWallet;
-    address private _bXHPaybackLiquidityWallet;
-    event HolderFeesUpdated(uint256 newFees,address from );
-    event HolderWalletUpdated(address newWallet,address from );
-    event BXHPaybackLiquidityFeesUpdated(uint256 newFees,address from );
-    event BXHPaybackLiquidityWalletUpdated(address newWallet,address from );
-        constructor(
+     bool private _burnActivated;
+           constructor(
         string memory _name,
         string memory _symbol,
         uint256 _cap,
         address _owner
     )ERC20Permit(_name) ERC20PresetMinterPauser(_name,_symbol,_owner) ERC20Capped(_cap) {
     }
-// private functions 
-    function _getShares(uint256 _amount) view  private returns (uint256 taxShare,uint256 holderShare,uint256 remaining) {
-        taxShare = _amount*(_bXHPaybackLiquidityFees/100);
-        holderShare = _amount*(_holdersReflectionFees/100);
-        remaining=_amount -(taxShare+holderShare);
-    }
+
 
 
 
@@ -55,89 +42,16 @@ contract BXHWorldToken is ERC20Permit, ERC20PresetMinterPauser, ERC20Capped{
         require(hasRole(BURNER_ROLE, _msgSender()), "ElboxahToken: must have BURNER_ROLE");
         _burnActivated =!_burnActivated;
     }
-    function updateHolderFees(uint256 fee) external {
-        // TODO : ask about the mini ams max 
-                require(fee>0,"fees percentage must be more than zero");
-                require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "ElboxahToken: must have Admin_ROLE");
-                _holdersReflectionFees=fee;
-                // emit event 
-                emit HolderFeesUpdated(fee,  _msgSender());
-   
-    }
-
-  function updateBXHPaybackLiquidityFees(uint256 fee) external {
-        // TODO : ask about the mini ams max 
-                require(fee>0,"fees percentage must be more than zero");
-                require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "ElboxahToken: must have Admin_ROLE");
-                _bXHPaybackLiquidityFees=fee;
-                // emit event 
-                emit BXHPaybackLiquidityFeesUpdated(fee,  _msgSender());
-   
-    }
-    function updateBXHPaybackLiquidityWallet(address newWallet) external {
-                require(newWallet!= address(0),"Zero address is not allowed ");
-                require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "ElboxahToken: must have Admin_ROLE");
-                _bXHPaybackLiquidityWallet=newWallet;
-                // emit event 
-                emit BXHPaybackLiquidityWalletUpdated(newWallet,  _msgSender());
-   
-    }
-    function updateHolderWallet(address newWallet) external {
-                require(newWallet!= address(0),"Zero address is not allowed ");
-                require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "ElboxahToken: must have Admin_ROLE");
-                _holdersReflectionWallet=newWallet;
-                // emit event 
-                emit HolderWalletUpdated(newWallet,  _msgSender());
-   
-    }
-
 function burnActivated() view external returns (bool ) {
     return _burnActivated;
 }
-    function holderWallet() view external returns (address) {
-        return _holdersReflectionWallet;
-    }
-    function bXHPaybackLiquidityWallet() view external returns (address) {
-        return _bXHPaybackLiquidityWallet;
-    }
-    function holderFees() view external returns (uint256) {
-        return _holdersReflectionFees;
-    }
-    function bXHPaybackLiquidityFees() view external returns (uint256) {
-        return _bXHPaybackLiquidityFees;
-    }
-    // public
-       /**
-     * @dev See {IERC20-transfer}.
-     *
-     * Requirements:
-     *
-     * - `to` cannot be the zero address.
-     * - the caller must have a balance of at least `amount`.
-     */
-    function transfer(address to, uint256 amount) public virtual override (ERC20) returns (bool) {
-        address owner = _msgSender();
-         (uint256 taxShare,uint256 holderShare,uint256 remaining)= _getShares( amount); 
-        _transfer(owner, _bXHPaybackLiquidityWallet, taxShare);
-        _transfer(owner, _holdersReflectionWallet, holderShare);
-        _transfer(owner, to, remaining);
-        return true;
-    }
-     function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) public virtual override (ERC20) returns (bool) {
-        address spender = _msgSender();
-        _spendAllowance(from, spender, amount);
-         (uint256 taxShare,uint256 holderShare,uint256 remaining)= _getShares( amount); 
-        _transfer(from, _bXHPaybackLiquidityWallet, taxShare);
-        _transfer(from, _holdersReflectionWallet, holderShare);
-        _transfer(from, to, remaining);
-    
-        _transfer(from, to, remaining);
-        return true;
-    }
+
+// temp for test
+function getChainId() view external returns (uint256 ) {
+    return block.chainid;
+}
+   
+ 
     /**
      * @dev Destroys `amount` tokens from the caller.
      *
