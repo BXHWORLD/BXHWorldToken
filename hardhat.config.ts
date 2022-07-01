@@ -34,7 +34,7 @@ const config: HardhatUserConfig = {
       chainId: 97,
     },
     bsc: {
-      url: "https://bsc.getblock.io/mainnet/?api_key=d1f20bc9-593e-4ba2-a1c9-19d132a08d57",
+      url: "https://bsc-dataseed.binance.org/",
       accounts: [privateKey],
       saveDeployments: true,
       chainId: 56,
